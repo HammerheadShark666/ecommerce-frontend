@@ -5,12 +5,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
-import { useLoginMutation } from "./authApi";
+import { useLoginMutation } from "./login.api";
 import {
   setCredentials,
   setTwoFactorPending,
-} from "./authSlice";
-import type { AppDispatch } from "../../app/store";
+} from "./login.slice";
+import type { AppDispatch } from "../../../app/store";
 
 const loginSchema = z.object({
   email: z
