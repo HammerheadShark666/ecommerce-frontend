@@ -2,15 +2,8 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-//import { useDispatch, useSelector } from "react-redux";
 
 import { usePasswordResetRequestMutation } from "./password-reset-request.api";
-// import {
-//   setMessage,
-// } from "./password-reset-request.slice";
-
-//import type { AppDispatch, RootState } from "../../../../app/store";
-//import { data } from "react-router-dom";
 
 const passwordResetRequestSchema = z.object({
   email: z
@@ -21,10 +14,8 @@ const passwordResetRequestSchema = z.object({
 type PasswordResetRequestForm = z.infer<typeof passwordResetRequestSchema>;
 
 export default function PasswordResetRequestPage() {  
-  //const dispatch = useDispatch<AppDispatch>();
 
   const [message, setMessage] = useState<string | null>(null);
-
   const [passwordResetRequest, { data, isLoading, error }] = usePasswordResetRequestMutation();
 
   const {
@@ -35,10 +26,6 @@ export default function PasswordResetRequestPage() {
     resolver: zodResolver(passwordResetRequestSchema),
   });
 
-  // const message = useSelector(
-  //   (state: RootState) => state.passwordResetRequest.message
-  // );
-
   useEffect(() => {
     // Optional: clear sensitive form data when leaving the page.
     return () => {};
@@ -47,17 +34,8 @@ export default function PasswordResetRequestPage() {
   const onSubmit = async (data: PasswordResetRequestForm) => {
     try {
       const result = await passwordResetRequest(data).unwrap();
-
       setMessage(result.message);
-
-      // dispatch(
-      //     setMessage({
-      //       message: result.message,
-      //     })
-      //   );
-      // {       
-        return;
-      //}
+      return;
     } catch {
       // RTK Query exposes the error through `error`.
       // No additional action is required here.
@@ -138,51 +116,6 @@ export default function PasswordResetRequestPage() {
                 </button>
               </>
           )}
-
-
-
-    {/* <div>
-
-            <label htmlFor="email">
-              Email address
-            </label>
-
-            <input
-              id="email"
-              type="email"
-              autoComplete="email"
-              {...register("email")}
-            />
-
-             {message && (
-              <p role="note">
-                {message}
-              </p>
-            )}
-
-
-            {errors.email && (
-              <p role="alert">
-                {errors.email.message}
-              </p>
-            )}
-          </div>
-
-          {errorMessage && (
-            <p role="alert">
-              {errorMessage}
-            </p>
-          )}
-
-
-          
-
-          <button
-            type="submit"
-            disabled={isLoading}
-          >
-            {isLoading ? "Signing in..." : "Sign in"}
-          </button> */}
         </form>       
       </div>
     </main>

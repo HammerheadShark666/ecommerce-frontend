@@ -5,6 +5,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
 import { useLoginMutation } from "./login.api";
 import {
   setCredentials,
@@ -108,129 +118,144 @@ export default function LoginPage() {
   const errorMessage = getErrorMessage();
 
   return (
-    <main>
-      <div>
-        <h1>Sign in</h1>
+    // <main>
+    //   <div>
+    //     <h1>Sign in</h1>
 
-        <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          <div>
-            <label htmlFor="email">
-              Email address
-            </label>
+    //     <form onSubmit={handleSubmit(onSubmit)} noValidate>
+    //       <div>
+    //         <label htmlFor="email">
+    //           Email address
+    //         </label>
 
-            <input
-              id="email"
-              type="email"
-              autoComplete="email"
-              {...register("email")}
-            />
+    //         <input
+    //           id="email"
+    //           type="email"
+    //           autoComplete="email"
+    //           {...register("email")}
+    //         />
 
-            {errors.email && (
-              <p role="alert">
-                {errors.email.message}
-              </p>
-            )}
-          </div>
+    //         {errors.email && (
+    //           <p role="alert">
+    //             {errors.email.message}
+    //           </p>
+    //         )}
+    //       </div>
 
-          <div>
-            <label htmlFor="password">
-              Password
-            </label>
+    //       <div>
+    //         <label htmlFor="password">
+    //           Password
+    //         </label>
 
-            <input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              {...register("password")}
-            />
+    //         <input
+    //           id="password"
+    //           type="password"
+    //           autoComplete="current-password"
+    //           {...register("password")}
+    //         />
 
-            {errors.password && (
-              <p role="alert">
-                {errors.password.message}
-              </p>
-            )}
-          </div>
+    //         {errors.password && (
+    //           <p role="alert">
+    //             {errors.password.message}
+    //           </p>
+    //         )}
+    //       </div>
 
-          {errorMessage && (
-            <p role="alert">
-              {errorMessage}
+    //       {errorMessage && (
+    //         <p role="alert">
+    //           {errorMessage}
+    //         </p>
+    //       )}
+
+    //       <button
+    //         type="submit"
+    //         disabled={isLoading}
+    //       >
+    //         {isLoading ? "Signing in..." : "Sign in"}
+    //       </button>
+    //     </form>
+
+    //     <p>
+    //       Don't have an account?{" "}
+    //       <Link to="/register">
+    //         Create an account
+    //       </Link>
+    //     </p>
+
+    //     <p>
+    //       <Link to="/forgot-password">
+    //         Forgot your password?
+    //       </Link>
+    //     </p>
+    //   </div>
+    // </main>
+    <main className="flex min-h-screen items-center justify-center bg-muted/40 px-4">
+  <Card className="w-full max-w-sm">
+    <CardHeader>
+      <CardTitle className="text-2xl">Sign in</CardTitle>
+    </CardHeader>
+
+    <CardContent>
+      <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="email">Email address</Label>
+          <Input
+            id="email"
+            type="email"
+            autoComplete="email"
+            aria-invalid={!!errors.email}
+            {...register("email")}
+          />
+          {errors.email && (
+            <p role="alert" className="text-sm text-destructive">
+              {errors.email.message}
             </p>
           )}
+        </div>
 
-          <button
-            type="submit"
-            disabled={isLoading}
-          >
-            {isLoading ? "Signing in..." : "Sign in"}
-          </button>
-        </form>
+        <div className="space-y-2">
+          <Label htmlFor="password">Password</Label>
+          <Input
+            id="password"
+            type="password"
+            autoComplete="current-password"
+            aria-invalid={!!errors.password}
+            {...register("password")}
+          />
+          {errors.password && (
+            <p role="alert" className="text-sm text-destructive">
+              {errors.password.message}
+            </p>
+          )}
+        </div>
 
-        <p>
-          Don't have an account?{" "}
-          <Link to="/register">
+        {errorMessage && (
+          <p role="alert" className="text-sm text-destructive">
+            {errorMessage}
+          </p>
+        )}
+
+        <Button type="submit" disabled={isLoading} className="w-full">
+          {isLoading ? "Signing in..." : "Sign in"}
+        </Button>
+      </form>
+
+      <div className="mt-6 space-y-2 text-center text-sm">
+        <p className="text-muted-foreground">
+          Don&apos;t have an account?{" "}
+          <Link to="/register" className="font-medium text-primary underline-offset-4 hover:underline">
             Create an account
           </Link>
         </p>
 
         <p>
-          <Link to="/forgot-password">
+          <Link to="/forgot-password" className="text-muted-foreground underline-offset-4 hover:underline">
             Forgot your password?
           </Link>
         </p>
       </div>
-    </main>
+    </CardContent>
+  </Card>
+</main>
   );
 }
-
-
-// import { useEffect } from "react";
-
-// export default function LoginPage() {
-//   useEffect(() => {
-//     fetch("https://localhost:7242/cors-post-test", {
-//       method: "POST",
-//       credentials: "include",
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//       body: JSON.stringify({ test: true }),
-//     })
-//       .then(async (response) => {
-//         console.log("Status:", response.status);
-//         console.log("Response:", await response.json());
-//       })
-//       .catch((error) => {
-//         console.error("CORS test failed:", error);
-//       });
-//   }, []);
-
-//   return (
-//     <div>
-//       <h1>Login</h1>
-//     </div>
-//   );
-// }
-
-
-
-// import { useEffect } from "react";
-
-// export default function LoginPage() {
-//   useEffect(() => {
-//     fetch("https://localhost:7242/cors-test", {
-//       credentials: "include",
-//     })
-//       .then((response) => {
-//         console.log("Status:", response.status);
-//         return response.json();
-//       })
-//       .then((data) => {
-//         console.log("Response:", data);
-//       })
-//       .catch((error) => {
-//         console.error("CORS test failed:", error);
-//       });
-//   }, []);
-
-//   return <h1>Login</h1>;
-//}
