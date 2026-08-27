@@ -5,6 +5,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { usePasswordResetRequestMutation } from "./password-reset-request.api";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { AuthLayout } from "@/components/layouts/authLayout";
+
 const passwordResetRequestSchema = z.object({
   email: z
     .string()
@@ -66,58 +71,49 @@ export default function PasswordResetRequestPage() {
   const errorMessage = getErrorMessage();
 
   return (
-    <main>
-      <div>
-        <h1>Request Password Reset</h1>
+    <AuthLayout title="Request Password Reset">
+      <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+        {data?.message ? (
+          <p role="status" className="text-sm text-muted-foreground">
+            {data.message}
+          </p>
+        ) : (
+          <>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email address</Label>
+              <Input
+                id="email"
+                type="email"
+                autoComplete="email"
+                aria-invalid={!!errors.email}
+                {...register("email")}
+              />
 
-        <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          
-          {data?.message ? (
-              <p>{data.message}</p>
-            ) : (
-              <>
-                <div>
-                  <label htmlFor="email">
-                    Email address
-                  </label>
+              {message && (
+                <p role="note" className="text-sm text-muted-foreground">
+                  {message}
+                </p>
+              )}
 
-                  <input
-                    id="email"
-                    type="email"
-                    autoComplete="email"
-                    {...register("email")}
-                  />
+              {errors.email && (
+                <p role="alert" className="text-sm text-destructive">
+                  {errors.email.message}
+                </p>
+              )}
+            </div>
 
-                  {message && (
-                    <p role="note">
-                      {message}
-                    </p>
-                  )}
+            {errorMessage && (
+              <p role="alert" className="text-sm text-destructive">
+                {errorMessage}
+              </p>
+            )}
 
-                  {errors.email && (
-                    <p role="alert">
-                      {errors.email.message}
-                    </p>
-                  )}
-
-                </div>
-
-                {errorMessage && (
-                  <p role="alert">
-                    {errorMessage}
-                  </p>
-                )}          
-
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Sending request..." : "Send Request"}
-                </button>
-              </>
-          )}
-        </form>       
-      </div>
-    </main>
+            <Button type="submit" disabled={isLoading} className="w-full">
+              {isLoading ? "Sending request..." : "Send Request"}
+            </Button>
+          </>
+        )}
+      </form>
+    </AuthLayout>
   );
 }

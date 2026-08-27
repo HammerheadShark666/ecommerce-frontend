@@ -1,0 +1,25 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "vite: dev",
+      "type": "shell",
+      "command": "npm run dev -- --host 127.0.0.1",
+      "options": {
+        "cwd": "${workspaceFolder}/ecommerce.frontend"
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "vite",
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*",
+          "endsPattern": "Local:.*127\\.0\\.0\\.1:5173"
+        }
+      }
+    }
+  ]
+}

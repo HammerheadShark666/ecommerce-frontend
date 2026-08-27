@@ -16,6 +16,13 @@ export function getApiErrorMessage(
     return "An unexpected error occurred.";
   }
 
+  // RTK Query couldn't parse the response body as JSON (e.g. an empty
+  // or plain-text body, common on 429s from rate-limiting middleware).
+  // The real HTTP status lives in `originalStatus`, not `status`, here.
+  if (error.status === "PARSING_ERROR") {
+    return getStatusMessage(error.originalStatus);
+  }
+
   // No response body
   if (
     typeof error.data !== "object" ||
@@ -54,7 +61,7 @@ export function getApiErrorMessage(
 }
 
 function getStatusMessage(
-  status: FetchBaseQueryError["status"]
+  status: number | string
 ): string {
   if (typeof status !== "number") {
     return "Unable to connect to the server.";

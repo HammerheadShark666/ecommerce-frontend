@@ -1,27 +1,27 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useSearchParams } from "react-router-dom";
-import { getApiErrorMessage } from "../../../../app/api.error-handler";
+import { Link, useSearchParams } from "react-router-dom";
+import { getApiErrorMessage } from "@/app/api.error-handler";
 
-import {
-  isApiValidationError,
-} from "../../../../app/api.errors";
+import { isApiValidationError } from "@/app/api.errors";
 
 import {
   useGetTwoFactorStatusQuery,
   useResetPasswordMutation,
 } from "./password-reset.api";
 
-const resetPasswordSchema = z.object({
-  email: z
-    .string()
-    .email("Please enter a valid email address"),
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { AuthLayout } from "@/components/layouts/authLayout";
+import { cn } from "@/lib/utils";
 
-  newPassword: z
-    .string()
-    .min(8, "Please enter a new password"),
+const resetPasswordSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+
+  newPassword: z.string().min(8, "Please enter a new password"),
 
   code: z
     .string()
@@ -29,14 +29,13 @@ const resetPasswordSchema = z.object({
     .optional(),
 });
 
-type ResetPasswordForm = z.infer<
-  typeof resetPasswordSchema
->;
+type ResetPasswordForm = z.infer<typeof resetPasswordSchema>;
 
 export default function ResetPasswordPage() {
-
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
+
+  const [generalError, setGeneralError] = useState<string | null>(null);
 
   const {
     data: twoFactorData,
@@ -48,11 +47,7 @@ export default function ResetPasswordPage() {
 
   const [
     resetPassword,
-    {
-      isLoading: isResettingPassword,
-      error: resetPasswordError,
-      isSuccess,
-    },
+    { isLoading: isResettingPassword, isSuccess },
   ] = useResetPasswordMutation();
 
   const {
@@ -65,20 +60,18 @@ export default function ResetPasswordPage() {
     resolver: zodResolver(resetPasswordSchema),
   });
 
-  const twoFactorEnabled =
-    twoFactorData?.isEnabled === true;
- 
+  const twoFactorEnabled = twoFactorData?.isEnabled === true;
 
   useEffect(() => {
     return () => reset();
   }, [reset]);
 
-  const onSubmit = async (data: ResetPasswordForm) => {
+  const onSubmit = async (formValues: ResetPasswordForm) => {
     if (!token) {
       return;
     }
 
-    if (twoFactorEnabled && !data.code) {
+    if (twoFactorEnabled && !formValues.code) {
       setError("code", {
         type: "required",
         message: "Please enter your 6 digit verification code",
@@ -86,22 +79,23 @@ export default function ResetPasswordPage() {
       return;
     }
 
+    setGeneralError(null);
+
     try {
       await resetPassword({
         token,
-        email: data.email,
-        newPassword: data.newPassword,
-        ...(twoFactorEnabled && data.code
-          ? { code: data.code }
+        email: formValues.email,
+        newPassword: formValues.newPassword,
+        ...(twoFactorEnabled && formValues.code
+          ? { code: formValues.code }
           : {}),
       }).unwrap();
     } catch (error) {
-
       if (typeof error === "object" && error !== null && "data" in error) {
-        const data = error.data;
+        const errorData = error.data;
 
-        if (isApiValidationError(data)) {
-          Object.entries(data.errors).forEach(([field, messages]) => {
+        if (isApiValidationError(errorData)) {
+          Object.entries(errorData.errors).forEach(([field, messages]) => {
             if (messages.length > 0) {
               setError(field as keyof ResetPasswordForm, {
                 type: "server",
@@ -109,152 +103,128 @@ export default function ResetPasswordPage() {
               });
             }
           });
+          // Field-level errors are shown inline against each input.
+          // Don't also surface them in the general error banner.
+          return;
         }
       }
+
+      setGeneralError(
+        getApiErrorMessage(error) ?? "Something went wrong. Please try again."
+      );
     }
   };
 
-  const errorMessage = getApiErrorMessage(
-  resetPasswordError ?? twoFactorError
-);
-
   if (!token) {
     return (
-      <main>
-        <div>
-          <h1>Reset Password</h1>
-
-          <p role="alert">
-            Invalid or missing password reset token.
-          </p>
-        </div>
-      </main>
+      <AuthLayout title="Reset Password">
+        <p role="alert" className="text-sm text-destructive">
+          Invalid or missing password reset token.
+        </p>
+      </AuthLayout>
     );
   }
 
   if (isCheckingTwoFactor) {
     return (
-      <main>
-        <div>
-          <h1>Reset Password</h1>
-
-          <p>Checking your account...</p>
-        </div>
-      </main>
+      <AuthLayout title="Reset Password">
+        <p className="text-sm text-muted-foreground">Checking your account...</p>
+      </AuthLayout>
     );
   }
 
   if (twoFactorError) {
     return (
-      <main>
-        <div>
-          <h1>Reset Password</h1>
+      <AuthLayout title="Reset Password">
+        <p role="alert" className="text-sm text-destructive">
+          {getApiErrorMessage(twoFactorError) ??
+            "Unable to verify this password reset link."}
+        </p>
+      </AuthLayout>
+    );
+  }
 
-          <p role="alert">
-            {getApiErrorMessage(twoFactorError) ??
-              "Unable to verify this password reset link."}
+  if (isSuccess) {
+    return (
+      <AuthLayout title="Reset Password">
+        <div className="space-y-4 text-center">
+          <p role="status" className="text-sm text-muted-foreground">
+            Your password has been changed successfully.
           </p>
+
+          <Link to="/login" className={cn(buttonVariants(), "w-full")}>
+            Sign in
+          </Link>
         </div>
-      </main>
+      </AuthLayout>
     );
   }
 
   return (
-    <main>
-      <div>
-        <h1>Reset Password</h1>
-
-        {isSuccess ? (
-          <div>
-            <p role="status">
-              Your password has been changed successfully.
+    <AuthLayout title="Reset Password">
+      <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="email">Email address</Label>
+          <Input
+            id="email"
+            type="email"
+            autoComplete="email"
+            aria-invalid={!!errors.email}
+            {...register("email")}
+          />
+          {errors.email && (
+            <p role="alert" className="text-sm text-destructive">
+              {errors.email.message}
             </p>
-          </div>
-        ) : (
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            noValidate
-          >
-            <div>
-            <label htmlFor="email">
-              Email address
-            </label>
+          )}
+        </div>
 
-            <input
-              id="email"
-              type="email"
-              autoComplete="email"
-              {...register("email")}
+        <div className="space-y-2">
+          <Label htmlFor="newPassword">New password</Label>
+          <Input
+            id="newPassword"
+            type="password"
+            autoComplete="new-password"
+            aria-invalid={!!errors.newPassword}
+            {...register("newPassword")}
+          />
+          {errors.newPassword && (
+            <p role="alert" className="text-sm text-destructive">
+              {errors.newPassword.message}
+            </p>
+          )}
+        </div>
+
+        {twoFactorEnabled && (
+          <div className="space-y-2">
+            <Label htmlFor="code">6 digit verification code</Label>
+            <Input
+              id="code"
+              type="text"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              maxLength={6}
+              aria-invalid={!!errors.code}
+              {...register("code")}
             />
-
-            {errors.email && (
-              <p role="alert">
-                {errors.email.message}
+            {errors.code && (
+              <p role="alert" className="text-sm text-destructive">
+                {errors.code.message}
               </p>
             )}
           </div>
-
-
-            <div>
-              <label htmlFor="newPassword">
-                New password
-              </label>
-
-              <input
-                id="newPassword"
-                type="password"
-                autoComplete="new-password"
-                {...register("newPassword")}
-              />
-
-              {errors.newPassword && (
-                <p role="alert">
-                  {errors.newPassword.message}
-                </p>
-              )}
- 
-            </div>
-
-            {twoFactorEnabled && (
-              <div>
-                <label htmlFor="code">
-                  6 digit verification code
-                </label>
-
-                <input
-                  id="code"
-                  type="text"
-                  inputMode="numeric"
-                  autoComplete="one-time-code"
-                  maxLength={6}
-                  {...register("code")}
-                />
-
-                {errors.code && (
-                  <p role="alert">
-                    {errors.code.message}
-                  </p>
-                )}
-              </div>
-            )}
-         
-           {errorMessage && (
-            <p role="alert">
-              {errorMessage}
-            </p>
-           )}
-
-            <button
-              type="submit"
-              disabled={isResettingPassword}
-            >
-              {isResettingPassword
-                ? "Changing password..."
-                : "Change password"}
-            </button>
-          </form>
         )}
-      </div>
-    </main>
+
+        {generalError && (
+          <p role="alert" className="text-sm text-destructive">
+            {generalError}
+          </p>
+        )}
+
+        <Button type="submit" disabled={isResettingPassword} className="w-full">
+          {isResettingPassword ? "Changing password..." : "Change password"}
+        </Button>
+      </form>
+    </AuthLayout>
   );
 }

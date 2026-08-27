@@ -8,12 +8,12 @@ import { useDispatch } from "react-redux";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+// import {
+//   Card,
+//   CardContent,
+//   CardHeader,
+//   CardTitle,
+// } from "@/components/ui/card";
 
 import { useLoginMutation } from "./login.api";
 import {
@@ -21,6 +21,7 @@ import {
   setTwoFactorPending,
 } from "./login.slice";
 import type { AppDispatch } from "../../../app/store";
+import { AuthLayout } from "@/components/layouts/authLayout";
 
 const loginSchema = z.object({
   email: z
@@ -117,145 +118,139 @@ export default function LoginPage() {
 
   const errorMessage = getErrorMessage();
 
-  return (
-    // <main>
-    //   <div>
-    //     <h1>Sign in</h1>
+//   return (   
+//     <main className="flex min-h-screen items-center justify-center bg-muted/40 px-4">
+//       <Card className="w-full max-w-sm">
+//         <CardHeader>
+//           <CardTitle className="text-2xl">Sign in</CardTitle>
+//         </CardHeader>
 
-    //     <form onSubmit={handleSubmit(onSubmit)} noValidate>
-    //       <div>
-    //         <label htmlFor="email">
-    //           Email address
-    //         </label>
+//         <CardContent>
+//           <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+//             <div className="space-y-2">
+//               <Label htmlFor="email">Email address</Label>
+//               <Input
+//                 id="email"
+//                 type="email"
+//                 autoComplete="email"
+//                 aria-invalid={!!errors.email}
+//                 {...register("email")}
+//               />
+//               {errors.email && (
+//                 <p role="alert" className="text-sm text-destructive">
+//                   {errors.email.message}
+//                 </p>
+//               )}
+//             </div>
 
-    //         <input
-    //           id="email"
-    //           type="email"
-    //           autoComplete="email"
-    //           {...register("email")}
-    //         />
+//             <div className="space-y-2">
+//               <Label htmlFor="password">Password</Label>
+//               <Input
+//                 id="password"
+//                 type="password"
+//                 autoComplete="current-password"
+//                 aria-invalid={!!errors.password}
+//                 {...register("password")}
+//               />
+//               {errors.password && (
+//                 <p role="alert" className="text-sm text-destructive">
+//                   {errors.password.message}
+//                 </p>
+//               )}
+//             </div>
 
-    //         {errors.email && (
-    //           <p role="alert">
-    //             {errors.email.message}
-    //           </p>
-    //         )}
-    //       </div>
+//             {errorMessage && (
+//               <p role="alert" className="text-sm text-destructive">
+//                 {errorMessage}
+//               </p>
+//             )}
 
-    //       <div>
-    //         <label htmlFor="password">
-    //           Password
-    //         </label>
+//             <Button type="submit" disabled={isLoading} className="w-full">
+//               {isLoading ? "Signing in..." : "Sign in"}
+//             </Button>
+//           </form>
 
-    //         <input
-    //           id="password"
-    //           type="password"
-    //           autoComplete="current-password"
-    //           {...register("password")}
-    //         />
+//           <div className="mt-6 space-y-2 text-center text-sm">
+//             <p className="text-muted-foreground">
+//               Don&apos;t have an account?{" "}
+//               <Link to="/register" className="font-medium text-primary underline-offset-4 hover:underline">
+//                 Create an account
+//               </Link>
+//             </p>
 
-    //         {errors.password && (
-    //           <p role="alert">
-    //             {errors.password.message}
-    //           </p>
-    //         )}
-    //       </div>
+//             <p>
+//               <Link to="/forgot-password" className="text-muted-foreground underline-offset-4 hover:underline">
+//                 Forgot your password?
+//               </Link>
+//             </p>
+//           </div>
+//         </CardContent>
+//       </Card>
+//     </main>
+//   );
+// }
 
-    //       {errorMessage && (
-    //         <p role="alert">
-    //           {errorMessage}
-    //         </p>
-    //       )}
-
-    //       <button
-    //         type="submit"
-    //         disabled={isLoading}
-    //       >
-    //         {isLoading ? "Signing in..." : "Sign in"}
-    //       </button>
-    //     </form>
-
-    //     <p>
-    //       Don't have an account?{" "}
-    //       <Link to="/register">
-    //         Create an account
-    //       </Link>
-    //     </p>
-
-    //     <p>
-    //       <Link to="/forgot-password">
-    //         Forgot your password?
-    //       </Link>
-    //     </p>
-    //   </div>
-    // </main>
-    <main className="flex min-h-screen items-center justify-center bg-muted/40 px-4">
-  <Card className="w-full max-w-sm">
-    <CardHeader>
-      <CardTitle className="text-2xl">Sign in</CardTitle>
-    </CardHeader>
-
-    <CardContent>
-      <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="email">Email address</Label>
-          <Input
-            id="email"
-            type="email"
-            autoComplete="email"
-            aria-invalid={!!errors.email}
-            {...register("email")}
-          />
-          {errors.email && (
-            <p role="alert" className="text-sm text-destructive">
-              {errors.email.message}
-            </p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
-          <Input
-            id="password"
-            type="password"
-            autoComplete="current-password"
-            aria-invalid={!!errors.password}
-            {...register("password")}
-          />
-          {errors.password && (
-            <p role="alert" className="text-sm text-destructive">
-              {errors.password.message}
-            </p>
-          )}
-        </div>
-
-        {errorMessage && (
+return (
+  <AuthLayout title="Sign in">
+    <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="email">Email address</Label>
+        <Input
+          id="email"
+          type="email"
+          autoComplete="email"
+          aria-invalid={!!errors.email}
+          {...register("email")}
+        />
+        {errors.email && (
           <p role="alert" className="text-sm text-destructive">
-            {errorMessage}
+            {errors.email.message}
           </p>
         )}
-
-        <Button type="submit" disabled={isLoading} className="w-full">
-          {isLoading ? "Signing in..." : "Sign in"}
-        </Button>
-      </form>
-
-      <div className="mt-6 space-y-2 text-center text-sm">
-        <p className="text-muted-foreground">
-          Don&apos;t have an account?{" "}
-          <Link to="/register" className="font-medium text-primary underline-offset-4 hover:underline">
-            Create an account
-          </Link>
-        </p>
-
-        <p>
-          <Link to="/forgot-password" className="text-muted-foreground underline-offset-4 hover:underline">
-            Forgot your password?
-          </Link>
-        </p>
       </div>
-    </CardContent>
-  </Card>
-</main>
-  );
+
+      <div className="space-y-2">
+        <Label htmlFor="password">Password</Label>
+        <Input
+          id="password"
+          type="password"
+          autoComplete="current-password"
+          aria-invalid={!!errors.password}
+          {...register("password")}
+        />
+        {errors.password && (
+          <p role="alert" className="text-sm text-destructive">
+            {errors.password.message}
+          </p>
+        )}
+      </div>
+
+      {errorMessage && (
+        <p role="alert" className="text-sm text-destructive">
+          {errorMessage}
+        </p>
+      )}
+
+      <Button type="submit" disabled={isLoading} className="w-full">
+        {isLoading ? "Signing in..." : "Sign in"}
+      </Button>
+    </form>
+
+    <div className="mt-6 space-y-2 text-center text-sm">
+      <p className="text-muted-foreground">
+        Don&apos;t have an account?{" "}
+        <Link to="/register" className="font-medium text-primary underline-offset-4 hover:underline">
+          Create an account
+        </Link>
+      </p>
+
+      <p>
+        <Link to="/forgot-password" className="text-muted-foreground underline-offset-4 hover:underline">
+          Forgot your password?
+        </Link>
+      </p>
+    </div>
+  </AuthLayout>
+);
+
 }

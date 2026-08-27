@@ -1,13 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 
-import authReducer from "../features/auth/login/login.slice";
+import loginReducer from "../features/auth/login/login.slice";
 import passwordResetRequestReducer from "../features/auth/password-reset/password-reset-request/password-reset-request.slice";
 
 import { api } from "./api";
 
 export const store = configureStore({
   reducer: {
-    auth: authReducer,
+    login: loginReducer,
     passwordResetRequest: passwordResetRequestReducer,
     [api.reducerPath]: api.reducer,
   },
