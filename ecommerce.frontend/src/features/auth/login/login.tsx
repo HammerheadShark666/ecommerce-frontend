@@ -8,12 +8,6 @@ import { useDispatch } from "react-redux";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-// import {
-//   Card,
-//   CardContent,
-//   CardHeader,
-//   CardTitle,
-// } from "@/components/ui/card";
 
 import { useLoginMutation } from "./login.api";
 import {
@@ -118,139 +112,66 @@ export default function LoginPage() {
 
   const errorMessage = getErrorMessage();
 
-//   return (   
-//     <main className="flex min-h-screen items-center justify-center bg-muted/40 px-4">
-//       <Card className="w-full max-w-sm">
-//         <CardHeader>
-//           <CardTitle className="text-2xl">Sign in</CardTitle>
-//         </CardHeader>
+  return (
+    <AuthLayout title="Sign in">
+      <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="email">Email address</Label>
+          <Input
+            id="email"
+            type="email"
+            autoComplete="email"
+            aria-invalid={!!errors.email}
+            {...register("email")}
+          />
+          {errors.email && (
+            <p role="alert" className="text-sm text-destructive">
+              {errors.email.message}
+            </p>
+          )}
+        </div>
 
-//         <CardContent>
-//           <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
-//             <div className="space-y-2">
-//               <Label htmlFor="email">Email address</Label>
-//               <Input
-//                 id="email"
-//                 type="email"
-//                 autoComplete="email"
-//                 aria-invalid={!!errors.email}
-//                 {...register("email")}
-//               />
-//               {errors.email && (
-//                 <p role="alert" className="text-sm text-destructive">
-//                   {errors.email.message}
-//                 </p>
-//               )}
-//             </div>
+        <div className="space-y-2">
+          <Label htmlFor="password">Password</Label>
+          <Input
+            id="password"
+            type="password"
+            autoComplete="current-password"
+            aria-invalid={!!errors.password}
+            {...register("password")}
+          />
+          {errors.password && (
+            <p role="alert" className="text-sm text-destructive">
+              {errors.password.message}
+            </p>
+          )}
+        </div>
 
-//             <div className="space-y-2">
-//               <Label htmlFor="password">Password</Label>
-//               <Input
-//                 id="password"
-//                 type="password"
-//                 autoComplete="current-password"
-//                 aria-invalid={!!errors.password}
-//                 {...register("password")}
-//               />
-//               {errors.password && (
-//                 <p role="alert" className="text-sm text-destructive">
-//                   {errors.password.message}
-//                 </p>
-//               )}
-//             </div>
-
-//             {errorMessage && (
-//               <p role="alert" className="text-sm text-destructive">
-//                 {errorMessage}
-//               </p>
-//             )}
-
-//             <Button type="submit" disabled={isLoading} className="w-full">
-//               {isLoading ? "Signing in..." : "Sign in"}
-//             </Button>
-//           </form>
-
-//           <div className="mt-6 space-y-2 text-center text-sm">
-//             <p className="text-muted-foreground">
-//               Don&apos;t have an account?{" "}
-//               <Link to="/register" className="font-medium text-primary underline-offset-4 hover:underline">
-//                 Create an account
-//               </Link>
-//             </p>
-
-//             <p>
-//               <Link to="/forgot-password" className="text-muted-foreground underline-offset-4 hover:underline">
-//                 Forgot your password?
-//               </Link>
-//             </p>
-//           </div>
-//         </CardContent>
-//       </Card>
-//     </main>
-//   );
-// }
-
-return (
-  <AuthLayout title="Sign in">
-    <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="email">Email address</Label>
-        <Input
-          id="email"
-          type="email"
-          autoComplete="email"
-          aria-invalid={!!errors.email}
-          {...register("email")}
-        />
-        {errors.email && (
+        {errorMessage && (
           <p role="alert" className="text-sm text-destructive">
-            {errors.email.message}
+            {errorMessage}
           </p>
         )}
-      </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
-        <Input
-          id="password"
-          type="password"
-          autoComplete="current-password"
-          aria-invalid={!!errors.password}
-          {...register("password")}
-        />
-        {errors.password && (
-          <p role="alert" className="text-sm text-destructive">
-            {errors.password.message}
-          </p>
-        )}
-      </div>
+        <Button type="submit" disabled={isLoading} className="w-full">
+          {isLoading ? "Signing in..." : "Sign in"}
+        </Button>
+      </form>
 
-      {errorMessage && (
-        <p role="alert" className="text-sm text-destructive">
-          {errorMessage}
+      <div className="mt-6 space-y-2 text-center text-sm">
+        <p className="text-muted-foreground">
+          Don&apos;t have an account?{" "}
+          <Link to="/register" className="font-medium text-primary underline-offset-4 hover:underline">
+            Create an account
+          </Link>
         </p>
-      )}
 
-      <Button type="submit" disabled={isLoading} className="w-full">
-        {isLoading ? "Signing in..." : "Sign in"}
-      </Button>
-    </form>
-
-    <div className="mt-6 space-y-2 text-center text-sm">
-      <p className="text-muted-foreground">
-        Don&apos;t have an account?{" "}
-        <Link to="/register" className="font-medium text-primary underline-offset-4 hover:underline">
-          Create an account
-        </Link>
-      </p>
-
-      <p>
-        <Link to="/forgot-password" className="text-muted-foreground underline-offset-4 hover:underline">
-          Forgot your password?
-        </Link>
-      </p>
-    </div>
-  </AuthLayout>
-);
-
+        <p>
+          <Link to="/forgot-password" className="text-muted-foreground underline-offset-4 hover:underline">
+            Forgot your password?
+          </Link>
+        </p>
+      </div>
+    </AuthLayout>
+  );
 }
