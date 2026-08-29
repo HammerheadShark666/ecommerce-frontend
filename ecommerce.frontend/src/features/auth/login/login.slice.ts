@@ -1,29 +1,29 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 interface AuthState {
-  accessToken: string | null;
   pendingToken: string | null;
   pendingTokenId: string | null;
+  email: string | null;
 }
 
 const initialState: AuthState = {
-  accessToken: null,
   pendingToken: null,
   pendingTokenId: null,
+  email: null,
 };
 
-const authSlice = createSlice({
-  name: "auth",
+const loginSlice = createSlice({
+  name: "login",
   initialState,
 
   reducers: {
     setCredentials: (
       state,
-      action: PayloadAction<{ accessToken: string }>
+      action: PayloadAction<{ email: string }>
     ) => {
-      state.accessToken = action.payload.accessToken;
       state.pendingToken = null;
       state.pendingTokenId = null;
+      state.email = action.payload.email;
     },
 
     setTwoFactorPending: (
@@ -31,17 +31,18 @@ const authSlice = createSlice({
       action: PayloadAction<{
         pendingToken: string;
         pendingTokenId: string;
+        email: string;
       }>
     ) => {
-      state.accessToken = null;
       state.pendingToken = action.payload.pendingToken;
       state.pendingTokenId = action.payload.pendingTokenId;
+      state.email = action.payload.email;
     },
 
-    logout: (state) => {
-      state.accessToken = null;
+    clearPending: (state) => {
       state.pendingToken = null;
       state.pendingTokenId = null;
+      state.email = null;
     },
   },
 });
@@ -49,7 +50,7 @@ const authSlice = createSlice({
 export const {
   setCredentials,
   setTwoFactorPending,
-  logout,
-} = authSlice.actions;
+  clearPending,
+} = loginSlice.actions;
 
-export default authSlice.reducer;
+export default loginSlice.reducer;

@@ -2,6 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 
 import loginReducer from "../features/auth/login/login.slice";
 import passwordResetRequestReducer from "../features/auth/password-reset/password-reset-request/password-reset-request.slice";
+import authReducer from "../features/auth/auth.slice";
 
 import { api } from "./api";
 
@@ -9,6 +10,7 @@ export const store = configureStore({
   reducer: {
     login: loginReducer,
     passwordResetRequest: passwordResetRequestReducer,
+    auth: authReducer,
     [api.reducerPath]: api.reducer,
   },
 
