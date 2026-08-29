@@ -16,7 +16,7 @@ export const api = createApi({
      
       const state = getState() as RootState;      
 
-      const token = state.login.accessToken;
+      const token = state.auth.jwtToken;
       if (token) {
         headers.set("Authorization", `Bearer ${token}`);
       }

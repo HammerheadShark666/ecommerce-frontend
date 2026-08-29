@@ -4,15 +4,18 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+import {
+  setCredentials 
+} from "../auth.slice";
+
 import { useLoginMutation } from "./login.api";
 import {
-  setCredentials,
   setTwoFactorPending,
+  clearPending
 } from "./login.slice";
 import type { AppDispatch } from "../../../app/store";
 import { AuthLayout } from "@/components/layouts/authLayout";
@@ -62,25 +65,29 @@ export default function LoginPage() {
           setTwoFactorPending({
             pendingToken: result.pendingToken,
             pendingTokenId: result.pendingTokenId,
+            email: data.email,
           })
         );
 
-        navigate("/two-factor");
+        navigate("/2fa-authentication", { state: { from: location.state?.from } });
         return;
-      }
+      }    
 
       if (!result.jwtToken) {
         throw new Error("Authentication token was not returned.");
       }
-
+      
       dispatch(
         setCredentials({
-          accessToken: result.jwtToken,
+          jwtToken: result.jwtToken,
+          email: data.email,
         })
       );
 
+      dispatch(clearPending());
+
       const from =
-        location.state?.from?.pathname ?? "/account";
+        location.state?.from?.pathname ?? "/";
 
       navigate(from, { replace: true });
     } catch {
