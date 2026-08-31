@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,7 +16,7 @@ import type { RootState } from "../../../app/store";
 import {
   useEnrolmentMutation,
   useVerifyMutation,
-  useLazyGetRecoveryCodesQuery,
+  //useLazyGetRecoveryCodesQuery,
 } from "./2faEnrolment.api";
 
 const codeSchema = z.object({
@@ -32,13 +32,12 @@ export default function TwofaEnrolmentPage() {
   const email = useSelector((state: RootState) => state.auth.email);
 
   const [step, setStep] = useState<Step>("loading");
-  const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
+  //const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
   const [hasSavedCodes, setHasSavedCodes] = useState(false);
 
   const [enrolTwofa, { data: enrolment, isLoading: isEnrolling }] = useEnrolmentMutation();
   const [verifyTwofa, { isLoading: isVerifying, error: verifyError }] = useVerifyMutation();
-  const [fetchRecoveryCodes, { isFetching: isFetchingCodes, error: recoveryError }] =
-    useLazyGetRecoveryCodesQuery();
+  //const [fetchRecoveryCodes, { isFetching: isFetchingCodes, error: recoveryError }] = useLazyGetRecoveryCodesQuery();
 
   const {
     register,
@@ -49,28 +48,40 @@ export default function TwofaEnrolmentPage() {
     resolver: zodResolver(codeSchema),
   });
 
-  const startEnrolment = (targetEmail: string) => {
+ 
+
+const startEnrolment = useCallback(
+  async (targetEmail: string) => {
     setStep("loading");
-    enrolTwofa({ email: targetEmail })
-      .unwrap()
-      .then(() => setStep("scan"))
-      .catch(() => setStep("enrol-failed"));
-  };
 
-  // Guard: this page requires a known, authenticated user.
-  useEffect(() => {
-
-
-    
-    if (!email) {
-      navigate("/login", { replace: true });
-      return;
+    try {
+      await enrolTwofa({ email: targetEmail }).unwrap();
+      setStep("scan");
+    } catch {
+      setStep("enrol-failed");
     }
+  },
+  [enrolTwofa],
+);
 
-    startEnrolment(email);
-    // Only re-run if the email identity changes, not on every render.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [email]);
+const hasStartedEnrolment = useRef(false);
+
+useEffect(() => {
+  if (!email) {
+    navigate("/login", { replace: true });
+    return;
+  }
+
+  if (hasStartedEnrolment.current) {
+    return;
+  }
+
+  hasStartedEnrolment.current = true;
+  void startEnrolment(email);
+}, [email, navigate, startEnrolment]);
+
+
+ 
 
   const onSubmit = async (data: CodeForm) => {
     if (!email) {
@@ -80,8 +91,8 @@ export default function TwofaEnrolmentPage() {
     try {
       await verifyTwofa({ email, code: data.code }).unwrap();
 
-      const codes = await fetchRecoveryCodes({ email }).unwrap();
-      setRecoveryCodes(codes.recoveryCodes);
+      // const codes = await fetchRecoveryCodes({ email }).unwrap();
+      // setRecoveryCodes(codes.recoveryCodes);
       setStep("recovery");
     } catch {
       setError("code", {
@@ -90,22 +101,22 @@ export default function TwofaEnrolmentPage() {
     }
   };
 
-  const handleCopyCodes = () => {
-    void navigator.clipboard.writeText(recoveryCodes.join("\n"));
-  };
+  // const handleCopyCodes = () => {
+  //   void navigator.clipboard.writeText(recoveryCodes.join("\n"));
+  // };
 
-  const handleDownloadCodes = () => {
-    const blob = new Blob([recoveryCodes.join("\n")], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "recovery-codes.txt";
-    link.click();
-    URL.revokeObjectURL(url);
-  };
+  // const handleDownloadCodes = () => {
+  //   const blob = new Blob([recoveryCodes.join("\n")], { type: "text/plain" });
+  //   const url = URL.createObjectURL(blob);
+  //   const link = document.createElement("a");
+  //   link.href = url;
+  //   link.download = "recovery-codes.txt";
+  //   link.click();
+  //   URL.revokeObjectURL(url);
+  // };
 
   const handleFinish = () => {
-    navigate("/account/security", { replace: true });
+    navigate("/", { replace: true });
   };
 
   if (step === "loading" || isEnrolling) {
@@ -137,7 +148,7 @@ export default function TwofaEnrolmentPage() {
           access to your authenticator app. They will not be shown again.
         </p>
 
-        {isFetchingCodes && (
+        {/* {isFetchingCodes && (
           <p className="mt-4 text-sm text-muted-foreground">Loading recovery codes…</p>
         )}
 
@@ -154,16 +165,16 @@ export default function TwofaEnrolmentPage() {
               <li key={code}>{code}</li>
             ))}
           </ul>
-        )}
+        )} */}
 
-        <div className="mt-4 flex gap-2">
+        {/* <div className="mt-4 flex gap-2">
           <Button type="button" variant="outline" onClick={handleCopyCodes}>
             Copy codes
           </Button>
           <Button type="button" variant="outline" onClick={handleDownloadCodes}>
             Download .txt
           </Button>
-        </div>
+        </div> */}
 
         <div className="mt-6 flex items-start gap-2">
           <input

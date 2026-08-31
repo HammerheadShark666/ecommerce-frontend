@@ -20,8 +20,7 @@ export const twofaEnrolmentApi = api.injectEndpoints({
         method: "POST",
         body: request,
       }),
-      }),
-    
+    }),    
 
     getRecoveryCodes: builder.query<RecoveryCodesResponse, RecoveryCodesRequest>({
       query: ({ email }) => ({
@@ -31,7 +30,7 @@ export const twofaEnrolmentApi = api.injectEndpoints({
       keepUnusedDataFor: 0,
     }),
 
-    }),
+  }),
 
 });
 
